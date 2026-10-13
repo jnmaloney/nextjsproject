@@ -17,7 +17,7 @@ export default function Home() {
       </Typography>
       <Grid container spacing={2} sx={{ mb: 4 }}>
         {stations.map((s) => (
-          <Grid item xs={12} sm={4} key={s.id}>
+          <Grid size={{ xs: 12, sm: 4 }} key={s.id}>
             <StationCard station={s} />
           </Grid>
         ))}
