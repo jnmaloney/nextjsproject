@@ -21,7 +21,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
       # No lock file committed yet, so use `npm install`. Download the
       # "package-lock" artifact from a run, commit it, then switch to `npm ci`.
       - run: npm install
