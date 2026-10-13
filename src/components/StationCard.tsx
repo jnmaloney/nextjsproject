@@ -1,7 +1,8 @@
 'use client';
 
-import { Card, CardActionArea, CardContent, LinearProgress, Typography } from '@mui/material';
+import { Box, Card, CardActionArea, CardContent, LinearProgress, Typography } from '@mui/material';
 import type { Station } from '@/mocks/stations';
+import { FaultBadge } from './FaultBadge';
 import { StatusBadge } from './StatusBadge';
 
 const barColour = { ok: 'success', degraded: 'warning', offline: 'error' } as const;
@@ -19,7 +20,12 @@ export function StationCard({ station, onSelect, testId = 'station-card' }: Stat
   const content = (
     <CardContent>
       <Typography variant="h6" component="h3">{station.name}</Typography>
-      <StatusBadge status={station.status} />
+      <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+        <StatusBadge status={station.status} />
+        {station.faults.map((f) => (
+          <FaultBadge key={f.type} fault={f} />
+        ))}
+      </Box>
       <Typography variant="body2" sx={{ mt: 1 }}>
         {station.antennasOnline} / {station.antennasTotal} antennas online
       </Typography>

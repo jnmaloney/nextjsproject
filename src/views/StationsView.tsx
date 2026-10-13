@@ -14,6 +14,7 @@ import {
   ToggleButtonGroup,
   Typography,
 } from '@mui/material';
+import { FaultBadge } from '@/components/FaultBadge';
 import { StationCard } from '@/components/StationCard';
 import { StatusBadge } from '@/components/StatusBadge';
 import { stations } from '@/mocks/stations';
@@ -57,6 +58,7 @@ export function StationsView({ onSelect }: StationsViewProps) {
             <TableRow>
               <TableCell>Station</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Faults</TableCell>
               <TableCell align="right">Antennas online</TableCell>
               <TableCell>Updated</TableCell>
             </TableRow>
@@ -71,6 +73,13 @@ export function StationsView({ onSelect }: StationsViewProps) {
                 </TableCell>
                 <TableCell>
                   <StatusBadge status={s.status} />
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                    {s.faults.map((f) => (
+                      <FaultBadge key={f.type} fault={f} />
+                    ))}
+                  </Box>
                 </TableCell>
                 <TableCell align="right">
                   {s.antennasOnline} / {s.antennasTotal}

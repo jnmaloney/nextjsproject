@@ -5,6 +5,9 @@
 export const FREQ_MIN_MHZ = 50;
 export const FREQ_MAX_MHZ = 350;
 
+/** Expected range for mean power, in dB. Stations outside this are "out of range". */
+export const EXPECTED_DB = { min: -85, max: -40 };
+
 export interface SpectrumData {
   freqMHz: number[];
   timestamps: string[]; // ISO, one per row of `power`
@@ -33,12 +36,17 @@ function mulberry32(seed: number) {
 
 // Narrowband interference: centre (MHz), width (MHz), height (dB), fraction of time on.
 const RFI = [
-  { f: 100, w: 3, a: 18, duty: 1 },
+  { f: 100, w: 3, a: 14, duty: 1 },
   { f: 137, w: 0.6, a: 25, duty: 0.3 },
   { f: 240, w: 1, a: 15, duty: 0.15 },
 ];
 
-export function getSpectrum(stationId: string, nFreq = 300, nTime = 60): SpectrumData {
+export function getSpectrum(
+  stationId: string,
+  nFreq = 300,
+  nTime = 60,
+  opts: { outOfRange?: boolean } = {},
+): SpectrumData {
   const rand = mulberry32(hash(stationId));
   const offset = (rand() - 0.5) * 4;
   const freqMHz = Array.from(
@@ -53,6 +61,8 @@ export function getSpectrum(stationId: string, nFreq = 300, nTime = 60): Spectru
     const active = RFI.map((r) => r.duty >= 1 || rand() < r.duty);
     return freqMHz.map((f) => {
       let p = -60 - 0.04 * (f - FREQ_MIN_MHZ) + offset + (rand() - 0.5) * 3;
+      // Fault: a broad hump of excess power, pushing the mean above the expected range.
+      if (opts.outOfRange) p += 30 * Math.exp(-0.5 * ((f - 200) / 35) ** 2);
       RFI.forEach((r, k) => {
         if (active[k]) p += r.a * Math.exp(-0.5 * ((f - r.f) / r.w) ** 2);
       });
