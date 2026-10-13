@@ -9,9 +9,26 @@ export interface Station {
   lastUpdated: string; // ISO timestamp
 }
 
-// SKA-Low stations have 256 antennas each. Values below are made up.
-export const stations: Station[] = [
-  { id: 's001', name: 'Station 001', status: 'ok', antennasOnline: 256, antennasTotal: 256, lastUpdated: '2026-10-13T02:00:00Z' },
-  { id: 's002', name: 'Station 002', status: 'degraded', antennasOnline: 231, antennasTotal: 256, lastUpdated: '2026-10-13T02:00:00Z' },
-  { id: 's003', name: 'Station 003', status: 'offline', antennasOnline: 0, antennasTotal: 256, lastUpdated: '2026-10-12T21:14:00Z' },
-];
+const ANTENNAS_PER_STATION = 256;
+
+// Mock data only. Every 7th station is offline, every 4th is degraded.
+export const stations: Station[] = Array.from({ length: 24 }, (_, i) => {
+  const n = i + 1;
+  let status: StationStatus = 'ok';
+  let antennasOnline = ANTENNAS_PER_STATION;
+  if (n % 7 === 0) {
+    status = 'offline';
+    antennasOnline = 0;
+  } else if (n % 4 === 0) {
+    status = 'degraded';
+    antennasOnline = ANTENNAS_PER_STATION - 5 - ((n * 3) % 40);
+  }
+  return {
+    id: `s${String(n).padStart(3, '0')}`,
+    name: `Station ${String(n).padStart(3, '0')}`,
+    status,
+    antennasOnline,
+    antennasTotal: ANTENNAS_PER_STATION,
+    lastUpdated: status === 'offline' ? '2026-10-12T21:14:00Z' : '2026-10-13T02:00:00Z',
+  };
+});
